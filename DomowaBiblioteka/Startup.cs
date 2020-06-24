@@ -6,6 +6,7 @@ using DomowaBiblioteka.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -14,18 +15,23 @@ namespace DomowaBiblioteka
 {
     public class Startup
     {
+
+        public IConfiguration Configuration { get; }
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
         }
 
-        public IConfiguration Configuration { get; }
-
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbContextPool<AppDbContext>(
+                    options => options.UseSqlServer(Configuration.GetConnectionString("BookDBConnection")));
+
             services.AddControllersWithViews();
-            services.AddSingleton<IBookRepository, MockBookRepository>();
+            //services.AddScoped<IBookRepository, SQLBookRepository>();
+            services.AddScoped<IBookRepository, MockBookRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

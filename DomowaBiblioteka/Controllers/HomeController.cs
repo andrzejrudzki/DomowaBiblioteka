@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using DomowaBiblioteka.Models;
 using System.Diagnostics.Eventing.Reader;
+using DomowaBiblioteka.ViewModels;
+using Microsoft.CodeAnalysis.Operations;
 
 namespace DomowaBiblioteka.Controllers
 {
@@ -22,9 +24,10 @@ namespace DomowaBiblioteka.Controllers
             _logger = logger;
         }
 
-        public IActionResult Index()
+        public ViewResult Index()
         {
-            return View();
+            var model = _bookRepository.GetAll();
+            return View(model);
         }
 
         public IActionResult Privacy()
@@ -32,6 +35,23 @@ namespace DomowaBiblioteka.Controllers
             return View();
         }
 
+        public IActionResult Details(int? id)
+        {
+
+            Book model = _bookRepository.Get(id??1);
+            HomeDetailsViewModel homeDetailsViewModel = new HomeDetailsViewModel()
+            {
+                Id = model.Id,
+                Cover = model.Cover,
+                Date = model.Date,
+                ItemType = model.ItemType,
+                Title = model.Title,
+                AuthorName = model.AuthorName,
+            };
+            
+            
+            return View(homeDetailsViewModel);
+        }
 
         [HttpGet]
         public IActionResult AddItem()
@@ -42,10 +62,13 @@ namespace DomowaBiblioteka.Controllers
         [HttpPost]
         public IActionResult AddItem(Book model)
         {
-            _bookRepository.Add(model);
-
+            if (ModelState.IsValid)
+            {
+            Book book = _bookRepository.Add(model);
+            return RedirectToAction("Details", new { id = book.Id });
+            }
             return View();
-        }
+       }
 
 
 

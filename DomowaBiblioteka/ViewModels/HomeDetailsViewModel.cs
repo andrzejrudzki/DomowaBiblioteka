@@ -1,24 +1,18 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using static DomowaBiblioteka.Models.Enums;
 
-namespace DomowaBiblioteka.Models
+namespace DomowaBiblioteka.ViewModels
 {
-    public class Book
+    public class HomeDetailsViewModel
     {
         public int Id { get; set; }
-        [Required(ErrorMessage = "Pole Tytuł jest wymagane.")]
         public string Title { get; set; }
-        [Required(ErrorMessage = "Pole Data jest wymagane.")]
         public DateTime Date { get; set; }
-
-        public ItemType ItemType { get; set; }    
+        public ItemType ItemType { get; set; }
         public string Cover { get; set; }
         public string AuthorName { get; set; }
     }
 }
-

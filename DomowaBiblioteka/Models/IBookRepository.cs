@@ -7,7 +7,11 @@ namespace DomowaBiblioteka.Models
 {
     public interface IBookRepository
     {
+        Book Get(int Id);
+        IEnumerable<Book> GetAll();
         Book Add(Book book);
-        List<Book> GetAll(); 
+        Book Update(Book bookChanges);
+        Book Delete(int id);
     }
 }
+
