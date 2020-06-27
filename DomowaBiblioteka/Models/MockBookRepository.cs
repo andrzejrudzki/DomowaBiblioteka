@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using static DomowaBiblioteka.Models.Enums;
 
 namespace DomowaBiblioteka.Models
 {
@@ -15,16 +16,18 @@ namespace DomowaBiblioteka.Models
         {
             _bookList = new List<Book>()
             {
-                new Book(){Title="Book1",Cover="string", AuthorName=""},
-                new Book(){Title="Book2",Cover="string", AuthorName=""},
-                new Book(){Title="Book3",Cover="string", AuthorName=""},
-                new Book(){Title="Book4",Cover="string", AuthorName=""}
+                new Book(){Id = 1,ItemType=ItemType.Book, Title="Book-Title", AuthorName="Author1"},
+                new Book(){Id = 2,ItemType=ItemType.CD,  Title="CD-Title", AuthorName="Author2"},
+                new Book(){Id = 3,ItemType=ItemType.DVD,  Title="DVD-Title", AuthorName="Author3"},
+                new Book(){Id = 4,ItemType=ItemType.Book,  Title="Book2-Title", AuthorName="Author4"}
             };
         }
 
         public Book Add(Book book)
         {
+            book.Id = _bookList.Max(e => e.Id) + 1;
             _bookList.Add(book);
+
             return book;
         }
 
@@ -40,7 +43,7 @@ namespace DomowaBiblioteka.Models
 
         public Book Get(int Id)
         {
-            return _bookList[Id];
+            return this._bookList.FirstOrDefault(e => e.Id == Id);
         }
 
         public IEnumerable<Book> GetAll()
@@ -50,15 +53,16 @@ namespace DomowaBiblioteka.Models
 
         public Book Update(Book bookChanges)
         {
-            Book employee = _bookList.FirstOrDefault(e => e.Id == bookChanges.Id);
-            if (employee != null)
+            Book book = _bookList.FirstOrDefault(e => e.Id == bookChanges.Id);
+            if (book != null)
             {
-                employee.Cover = bookChanges.Cover;
-                employee.Date = bookChanges.Date;
-                employee.AuthorName = bookChanges.AuthorName;
-                employee.ItemType = bookChanges.ItemType;
+                book.Title = bookChanges.Title;
+                book.Cover = bookChanges.Cover;
+                book.Date = bookChanges.Date;
+                book.AuthorName = bookChanges.AuthorName;
+                book.ItemType = bookChanges.ItemType;
             }
-            return employee;
+            return book;
         }
     }
 }

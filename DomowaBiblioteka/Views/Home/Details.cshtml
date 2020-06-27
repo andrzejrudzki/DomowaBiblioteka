@@ -1,11 +1,11 @@
 ﻿@model HomeDetailsViewModel
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Szczegóły";
+    var photoPath = "~/files/" + (Model.Cover ?? "noimage.jpg");
 }
 
-<h1>Details</h1>
-
+<h1>Szczegóły</h1>
 
 <div class="row justify-content-center m-3">
     <div class="col-sm-8">
@@ -15,7 +15,7 @@
             </div>
 
             <div class="card-body text-center">
-                <img class="card-img-top" src="~/images/noimage.jpg" />
+                <img class="card-img-top" src="@photoPath" asp-append-version="true" />
 
                 <h4>Employee ID : @Model.Id</h4>
                 <h4>AuthorName : @Model.AuthorName</h4>
@@ -23,9 +23,10 @@
 
             </div>
             <div class="card-footer text-center">
-                <a href="#" class="btn btn-primary">Back</a>
-                <a href="#" class="btn btn-primary">Edit</a>
-                <a href="#" class="btn btn-danger">Delete</a>
+                <a asp-controller="home" asp-action="index" class="btn btn-primary">Lista</a>
+                <a asp-controller="home" asp-action="Edit" asp-route-id="@Model.Id"
+                   class="btn btn-primary">Edytuj</a>
+                <a href="#" class="btn btn-danger">Usuń</a>
             </div>
         </div>
     </div>
@@ -35,10 +36,3 @@
     <script src="~/js/CustomScript.js"></script>
 }
 
-
-
-
-<div>
-    @Html.ActionLink("Edit", "Edit", new { /* id = Model.PrimaryKey */ }) |
-    <a asp-action="Index">Back to List</a>
-</div>
