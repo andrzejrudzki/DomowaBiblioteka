@@ -19,6 +19,7 @@ namespace DomowaBiblioteka.Models
         public ItemType ItemType { get; set; }    
         public string Cover { get; set; }
         public string AuthorName { get; set; }
+        public StatusType Status { get; set; }
     }
 }
 

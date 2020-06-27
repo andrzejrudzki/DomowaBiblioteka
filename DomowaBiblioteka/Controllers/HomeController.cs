@@ -45,6 +45,7 @@ namespace DomowaBiblioteka.Controllers
                 ItemType = book.ItemType,
                 Title = book.Title,
                 AuthorName = book.AuthorName,
+                Status = book.Status,
             };   
             
             return View(homeDetailsViewModel);
@@ -68,7 +69,8 @@ namespace DomowaBiblioteka.Controllers
                     Title = model.Title,
                     Date = model.Date,
                     ItemType = model.ItemType,
-                    Cover = uniqueFileName
+                    Cover = uniqueFileName,
+                    Status = model.Status
                 };
 
                 _bookRepository.Add(newBook);
@@ -90,7 +92,8 @@ namespace DomowaBiblioteka.Controllers
                 ItemType = book.ItemType,
                 Title = book.Title,
                 AuthorName = book.AuthorName,
-                ExistingPhotoPath = book.Cover
+                ExistingPhotoPath = book.Cover,
+                Status = book.Status
             };
             return View(bookEditViewModel);
         }
@@ -105,6 +108,7 @@ namespace DomowaBiblioteka.Controllers
                 book.Date = model.Date;
                 book.ItemType = model.ItemType;
                 book.AuthorName = model.AuthorName;
+                book.Status = model.Status;
 
                 if (model.Photo != null)
                 {

@@ -17,9 +17,32 @@
             <div class="card-body text-center">
                 <img class="card-img-top" src="@photoPath" asp-append-version="true" />
 
-                <h4>Employee ID : @Model.Id</h4>
-                <h4>AuthorName : @Model.AuthorName</h4>
-                <h4>Date : @Model.Date</h4>
+                <h4>Tytuł: @Model.Title</h4>
+                <h4>Data: @Model.Date</h4>
+                @if (Model.ItemType == Enums.ItemType.CD)
+                {
+                    <h4>Nazwa Wykonawcy: @Model.AuthorName</h4>
+                    <h4>Nośnik: CD</h4>
+                }
+                else if (Model.ItemType == Enums.ItemType.DVD)
+                {
+                    <h4>Nazwisko Reżysera: @Model.AuthorName</h4>
+                    <h4>Nośnik: DVD</h4>
+                }
+                else
+                {
+                    <h4>Nazwisko Autora: @Model.AuthorName</h4>
+                    <h4>Nośnik: książka</h4>
+                }
+
+                @if (Model.Status == Enums.StatusType.Dostepna)
+                {
+                    <h4>Status: Na półce </h4>
+                }
+                else
+                {
+                    <h4>Status: Wypożyczony </h4>
+                }
 
             </div>
             <div class="card-footer text-center">

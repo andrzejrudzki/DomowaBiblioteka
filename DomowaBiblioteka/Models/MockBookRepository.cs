@@ -61,6 +61,7 @@ namespace DomowaBiblioteka.Models
                 book.Date = bookChanges.Date;
                 book.AuthorName = bookChanges.AuthorName;
                 book.ItemType = bookChanges.ItemType;
+                book.Status = bookChanges.Status;
             }
             return book;
         }

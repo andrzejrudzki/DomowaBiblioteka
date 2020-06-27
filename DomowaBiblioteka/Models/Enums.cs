@@ -17,5 +17,14 @@ namespace DomowaBiblioteka.Models
             //Book
             Book
         }
+
+        public enum StatusType
+
+        {
+            //On The Shelf
+            Dostepna,
+            //Loaned 
+            Wypozyczony
+        }
     }
 }
