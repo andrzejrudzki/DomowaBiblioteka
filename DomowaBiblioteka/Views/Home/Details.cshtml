@@ -1,10 +1,9 @@
 ﻿@model HomeDetailsViewModel
 
-@{
-    ViewData["Title"] = "Szczegóły";
-    var photoPath = "~/files/" + (Model.Cover ?? "noimage.jpg");
+@{ ViewData["Title"] = "Szczegóły";
+    //var photoPath = "~/files/" + (Model.Cover ?? "noimage.jpg");
+    var photoPath = Model.Cover; // moje zeby wyswietlao tylko bloby }
 }
-
 <h1>Szczegóły</h1>
 
 <div class="row justify-content-center m-3">
@@ -21,33 +20,28 @@
                 <h4>Data: @Model.Date</h4>
                 @if (Model.ItemType == Enums.ItemType.CD)
                 {
-                    <h4>Nazwa Wykonawcy: @Model.AuthorName</h4>
-                    <h4>Nośnik: CD</h4>
-                }
-                else if (Model.ItemType == Enums.ItemType.DVD)
-                {
+    <h4>Nazwa Wykonawcy: @Model.AuthorName</h4>
+                    <h4>Nośnik: CD</h4> }
+                                else if (Model.ItemType == Enums.ItemType.DVD)
+                                {
                     <h4>Nazwisko Reżysera: @Model.AuthorName</h4>
-                    <h4>Nośnik: DVD</h4>
-                }
-                else
-                {
-                    <h4>Nazwisko Autora: @Model.AuthorName</h4>
-                    <h4>Nośnik: książka</h4>
-                }
+                                    <h4>Nośnik: DVD</h4> }
+                                                else
+                                                {
+                                    <h4>Nazwisko Autora: @Model.AuthorName</h4>
+                                                    <h4>Nośnik: książka</h4>}
 
                 @if (Model.Status == Enums.StatusType.Dostepna)
                 {
-                    <h4>Status: Na półce </h4>
-                }
+    <h4>Status: Na półce </h4> }
                 else
                 {
-                    <h4>Status: Wypożyczony </h4>
-                }
+    <h4>Status: Wypożyczony </h4>}
 
             </div>
             <div class="card-footer text-center">
-                <a asp-controller="home" asp-action="index" class="btn btn-primary">Lista</a>
-                <a asp-controller="home" asp-action="Edit" asp-route-id="@Model.Id"
+                <a asp-controller="Home" asp-action="index" class="btn btn-primary">Lista</a>
+                <a asp-controller="Home" asp-action="Edit" asp-route-id="@Model.Id"
                    class="btn btn-primary">Edytuj</a>
                 <a href="#" class="btn btn-danger">Usuń</a>
             </div>

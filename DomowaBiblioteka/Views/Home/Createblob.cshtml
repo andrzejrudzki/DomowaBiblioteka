@@ -1,0 +1,17 @@
+﻿@{
+    ViewData["Title"] = "Import do dysku Azure";
+}
+
+<div class="row">
+    <div class="col-md-6">
+        <form method="post" enctype="multipart/form-data" asp-controller="Home" asp-action="Createblob">
+            <div class="form-group">
+                <label> Select File </label>
+                <input class="form-control" name="files" multiple="multiple" type="file" />
+            </div>
+            <div class="form-group">
+                <input class="btn btn-success" type="submit" value="Submit" />
+            </div>
+        </form>
+    </div>
+</div>

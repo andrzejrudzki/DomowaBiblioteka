@@ -1,7 +1,5 @@
 ﻿@model IEnumerable<Book>
-@{
-    ViewData["Title"] = "Lista elementów";
-}
+@{ ViewData["Title"] = "Lista elementów"; }
 
 <h1>Lista elementów</h1>
 
@@ -9,18 +7,24 @@
 <div class="card-deck">
     @foreach (var book in Model)
     {
-        var photoPath = "~/files/" + (book.Cover ?? "noimage.jpg");
-        <div class="card m-3" style="min-width: 18rem; max-width:30.5%;">
-            <div class="card-header">
-                <h3>@book.Title</h3>
-            </div>
-            <img class="card-img-top imageThumbnail" src="@photoPath" asp-append-version="true"/>
-            <div class="card-footer text-center">
-                <a class="btn btn-primary" asp-controller="Home" asp-action="Details" asp-route-id="@book.Id">Szczegóły</a>
-                <a class="btn btn-primary" asp-controller="Home" asp-action="Edit" asp-route-id="@book.Id">Edytuj</a>
-                <a href="#" class="btn btn-danger">Usuń</a>
-            </div>
-        </div>
-    }
+        // var photoPath = "~/files/" + (book.Cover ?? "noimage.jpg");
+        var photoPath = book.Cover; // moja wersja zeby bralo link do bloba
+<div class="card m-3" style="min-width: 18rem; max-width:30.5%;">
+    <div class="card-header">
+        <h3>@book.Title</h3>
+    </div>
+    @*http://127.0.0.1:10000/devstoreaccount1/filescontainers/certyfikat.png*@
+
+    @* <img img class="img-fluid" src="http://127.0.0.1:10000/devstoreaccount1/filescontainers/certyfikat.png" alt="Zdjęcie główne biblioteki" />*@
+
+    @* <img class="card-img-top imageThumbnail" src="@photoPath" asp-append-version="true" />*@
+    <img img class="card-img-top imageThumbnail" src="@photoPath" asp-append-version="true" />
+
+    <div class="card-footer text-center">
+        <a class="btn btn-primary" asp-controller="Home" asp-action="Details" asp-route-id="@book.Id">Szczegóły</a>
+        <a class="btn btn-primary" asp-controller="Home" asp-action="Edit" asp-route-id="@book.Id">Edytuj</a>
+        <a href="#" class="btn btn-danger">Usuń</a>
+    </div>
+</div>}
 </div>
 
