@@ -15,6 +15,8 @@ using DomowaBiblioteka.ViewModels;
 using Microsoft.AspNetCore.Hosting;
 using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 using System.Diagnostics;
+using DomowaBiblioteka.Provders;
+using System.Threading;
 
 namespace DomowaBiblioteka.Controllers
 
@@ -28,12 +30,12 @@ namespace DomowaBiblioteka.Controllers
     {
         //----- dodane z homecontroler ---------
         private readonly ILogger<HomeController> _logger;
-        private readonly IBookRepository _bookRepository;
+        private readonly IHttpClientProvider _httpClientProvider;
         private readonly IHostingEnvironment hostingEnvironment;
         // --- ponizszy loger powoduje bledy ---
-        public HomeController(IConfiguration configuration, ILogger<HomeController> logger, IBookRepository bookRepository, IHostingEnvironment hostingEnvironment)
+        public HomeController(IConfiguration configuration, ILogger<HomeController> logger, IHttpClientProvider httpClientProvider, IHostingEnvironment hostingEnvironment)
         {          // chyba logowanie 
-            _bookRepository = bookRepository;
+            _httpClientProvider = httpClientProvider;
             _logger = logger;
             this.hostingEnvironment = hostingEnvironment;
             _configuration = configuration;
@@ -45,15 +47,15 @@ namespace DomowaBiblioteka.Controllers
         //   {
         //      _configuration = configuration;
         //  }
-        public ViewResult Index() // --- chyba wyswietlnie wszystkiego
+        public async Task<ViewResult> Index() // --- chyba wyswietlnie wszystkiego
         {
-            var model = _bookRepository.GetAll();
+            var model = await _httpClientProvider.GetAll();
             return View(model);
         }
         //-----------------------------
-        public IActionResult Details(int? id) // z HomeControler
+        public async Task<IActionResult> Details(int? id) // z HomeControler
         {
-            Book book = _bookRepository.Get(id ?? 1);
+            Book book = await _httpClientProvider.Get(id ?? 1);
             HomeDetailsViewModel homeDetailsViewModel = new
             HomeDetailsViewModel()
             {
@@ -153,51 +155,54 @@ namespace DomowaBiblioteka.Controllers
             byte[] dataFiles;
             // Pobiera konto magazynu z parametrów połączenia =  UseDevelopmentStorage=true;
 
-            CloudStorageAccount cloudStorageAccount = CloudStorageAccount.Parse(blobstorageconnection);
+            //CloudStorageAccount cloudStorageAccount = CloudStorageAccount.Parse(blobstorageconnection);
 
 
             // --- tworzenie blob client
-            CloudBlobClient cloudBlobClient = cloudStorageAccount.CreateCloudBlobClient();
+            //CloudBlobClient cloudBlobClient = cloudStorageAccount.CreateCloudBlobClient();
 
             // --- pobiera odwołanie do kontenera
-            CloudBlobContainer cloudBlobContainer = cloudBlobClient.GetContainerReference("filescontainers");
+            //CloudBlobContainer cloudBlobContainer = cloudBlobClient.GetContainerReference("filescontainers");
 
 
             // --- tworzy kontener jezeli nie istnieje
 
-            if (await cloudBlobContainer.CreateIfNotExistsAsync())
-            {
-                await cloudBlobContainer.SetPermissionsAsync(new BlobContainerPermissions
-                {
-                    PublicAccess = BlobContainerPublicAccessType.Blob
-                });
-            }
+            //if (await cloudBlobContainer.CreateIfNotExistsAsync())
+            //{
+            //    await cloudBlobContainer.SetPermissionsAsync(new BlobContainerPermissions
+            //    {
+            //        PublicAccess = BlobContainerPublicAccessType.Blob
+            //    });
+            //}
 
+            //BlobContainerPermissions permissions = new BlobContainerPermissions
+            //{
+            //    PublicAccess = BlobContainerPublicAccessType.Blob
+            //};
 
-
-            BlobContainerPermissions permissions = new BlobContainerPermissions
-            {
-                PublicAccess = BlobContainerPublicAccessType.Blob
-            };
-
-            string systemFileName = files.FileName;
-            await using (var target = new MemoryStream())
-            {
-                files.CopyTo(target);
-                dataFiles = target.ToArray();
-                // files.FileName
-            }
-            // To również nie powoduje wezwania serwisu; tworzy tylko obiekt lokalny
-
-            CloudBlockBlob cloudBlockBlob = cloudBlobContainer.GetBlockBlobReference(systemFileName);
-            await cloudBlockBlob.UploadFromByteArrayAsync(dataFiles, 0, dataFiles.Length);
-
-            //systemFileName.
-            string nazwa_bloaba1; //dorobilem1
-            nazwa_bloaba1 = cloudBlockBlob.Uri.ToString();
             string nazwa_bloaba; //dorobilem1
 
-            nazwa_bloaba = files.FileName.ToString();  // dorobilem1
+            if (files != null)
+            {
+                string systemFileName = files.FileName;
+                await using (var target = new MemoryStream())
+                {
+                    files.CopyTo(target);
+                    dataFiles = target.ToArray();
+                    // files.FileName
+                }
+
+                nazwa_bloaba = files.FileName.ToString();  // dorobilem1
+            }
+
+            // To również nie powoduje wezwania serwisu; tworzy tylko obiekt lokalny
+
+            //CloudBlockBlob cloudBlockBlob = cloudBlobContainer.GetBlockBlobReference(systemFileName);
+            //await cloudBlockBlob.UploadFromByteArrayAsync(dataFiles, 0, dataFiles.Length);
+
+            //systemFileName.
+            //nazwa_bloaba1 = cloudBlockBlob.Uri.ToString();
+
             //nazwa_bloaba = files.Name.ToString(); // dorobilem1
             //return View();
 
@@ -208,7 +213,6 @@ namespace DomowaBiblioteka.Controllers
             {
                 string uniqueFileName = ProcessUploadedFile(model); // to przerobic na link uri blob.Uri
 
-
                 Book newBook = new Book
                 {
                     Title = model.Title,
@@ -216,12 +220,14 @@ namespace DomowaBiblioteka.Controllers
                     ItemType = model.ItemType,
                     // do cover podac link uri blob.Uri
                     //  Cover = uniqueFileName,
-                    Cover = nazwa_bloaba1, // dodalem1 to jest z bloba nazwa
-                    Status = model.Status
+                    //Cover = nazwa_bloaba1, // dodalem1 to jest z bloba nazwa
+                    Status = model.Status,
+                    AuthorName = model.AuthorName
                 };
 
-                _bookRepository.Add(newBook);
-                return RedirectToAction("Details", new { id = newBook.Id });
+                var result = await _httpClientProvider.Add(newBook);
+
+                return RedirectToAction("Details", new { id = result.Id });
             }
 
             return View();
@@ -231,9 +237,9 @@ namespace DomowaBiblioteka.Controllers
         //...........................................................
 
         [HttpGet]
-        public ViewResult Edit(int id)
+        public async Task<ViewResult> Edit(int id)
         {
-            Book book = _bookRepository.Get(id);
+            Book book = await _httpClientProvider.Get(id);
             BookEditViewModel bookEditViewModel = new BookEditViewModel
             {
                 Id = book.Id,
@@ -254,65 +260,64 @@ namespace DomowaBiblioteka.Controllers
             //--- Azur ---
             //--- azurowe rozwiazanie ---
             {
-                string blobstorageconnection = _configuration.GetValue<string>
-                ("blobstorage");
+                //string blobstorageconnection = _configuration.GetValue<string>("blobstorage");
                 byte[] dataFiles;
                 // Pobiera konto magazynu z parametrów połączenia =
                 //UseDevelopmentStorage = true;
 
-                CloudStorageAccount cloudStorageAccount =
-                CloudStorageAccount.Parse(blobstorageconnection);
+                //CloudStorageAccount cloudStorageAccount =
+                //CloudStorageAccount.Parse(blobstorageconnection);
 
                 // --- tworzenie blob client
-                CloudBlobClient cloudBlobClient = cloudStorageAccount.CreateCloudBlobClient();
+                //CloudBlobClient cloudBlobClient = cloudStorageAccount.CreateCloudBlobClient();
 
                 // --- pobiera odwołanie do kontenera
-                CloudBlobContainer cloudBlobContainer =
-                cloudBlobClient.GetContainerReference("filescontainers");
+                //CloudBlobContainer cloudBlobContainer =
+                //cloudBlobClient.GetContainerReference("filescontainers");
 
                 // --- tworzy kontener jezeli nie istnieje
-                if (await cloudBlobContainer.CreateIfNotExistsAsync())
-                {
-                    await cloudBlobContainer.SetPermissionsAsync(new
-                    BlobContainerPermissions
-                    {
-                        PublicAccess = BlobContainerPublicAccessType.Blob
-                    });
-                }
-                BlobContainerPermissions permissions = new BlobContainerPermissions
-                {
-                    PublicAccess = BlobContainerPublicAccessType.Blob
-                };
-                string systemFileName = files.FileName;
-                await using (var target = new MemoryStream())
-                {
-                    files.CopyTo(target);
-                    dataFiles = target.ToArray();
-                    // files.FileName
-                }
+                //if (await cloudBlobContainer.CreateIfNotExistsAsync())
+                //{
+                //    await cloudBlobContainer.SetPermissionsAsync(new
+                //    BlobContainerPermissions
+                //    {
+                //        PublicAccess = BlobContainerPublicAccessType.Blob
+                //    });
+                //}
+                //BlobContainerPermissions permissions = new BlobContainerPermissions
+                //{
+                //    PublicAccess = BlobContainerPublicAccessType.Blob
+                //};
+                //string systemFileName = files.FileName;
+                //await using (var target = new MemoryStream())
+                //{
+                //    files.CopyTo(target);
+                //    dataFiles = target.ToArray();
+                //    // files.FileName
+                //}
                 // To również nie powoduje wezwania serwisu; tworzy tylko
                 //obiekt lokalny
-                CloudBlockBlob cloudBlockBlob =
-                cloudBlobContainer.GetBlockBlobReference(systemFileName);
-                await cloudBlockBlob.UploadFromByteArrayAsync(dataFiles, 0,
-                dataFiles.Length);
+                //CloudBlockBlob cloudBlockBlob =
+                //cloudBlobContainer.GetBlockBlobReference(systemFileName);
+                //await cloudBlockBlob.UploadFromByteArrayAsync(dataFiles, 0,
+                //dataFiles.Length);
                 //systemFileName.
-                string nazwa_bloaba1; //dorobilem1
-                nazwa_bloaba1 = cloudBlockBlob.Uri.ToString();
-                string nazwa_bloaba; //dorobilem1
-                nazwa_bloaba = files.FileName.ToString(); // dorobilem1
+                //string nazwa_bloaba1; //dorobilem1
+                //nazwa_bloaba1 = cloudBlockBlob.Uri.ToString();
+                //string nazwa_bloaba; //dorobilem1
+                //nazwa_bloaba = files.FileName.ToString(); // dorobilem1
 
                 //---  z HomeControler
                 if (ModelState.IsValid)
                 {
-                    Book book = _bookRepository.Get(model.Id);
+                    Book book = await _httpClientProvider.Get(model.Id);
                     book.Title = model.Title;
                     book.Date = model.Date;
                     book.ItemType = model.ItemType;
                     book.AuthorName = model.AuthorName;
                     book.Status = model.Status;
                     // dodalem cover
-                    book.Cover = nazwa_bloaba1; // dorobilem1 pobiera adres uri bloba
+                    //book.Cover = nazwa_bloaba1; // dorobilem1 pobiera adres uri bloba
                     /*
                     if (model.Photo != null)
                     {
@@ -325,7 +330,7 @@ namespace DomowaBiblioteka.Controllers
                         book.Cover = ProcessUploadedFile(model);
                     }
                     */
-                    _bookRepository.Update(book);
+                    await _httpClientProvider.Update(book);
                     return RedirectToAction("index");
                 }
                 return View();

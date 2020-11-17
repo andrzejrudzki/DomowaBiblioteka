@@ -1,13 +1,10 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
-using static DomowaBiblioteka.Models.Enums;
+using static DomowaBiblioteka.Common.Enums.Enums;
 
 namespace DomowaBiblioteka.Models
 {
+    //ToDo: change this model to viewmodel
     public class Book
     {
         public int Id { get; set; }

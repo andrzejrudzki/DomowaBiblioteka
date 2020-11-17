@@ -18,11 +18,11 @@
 
                 <h4>Tytuł: @Model.Title</h4>
                 <h4>Data: @Model.Date</h4>
-                @if (Model.ItemType == Enums.ItemType.CD)
+                @if (Model.ItemType == DomowaBiblioteka.Common.Enums.Enums.ItemType.CD)
                 {
     <h4>Nazwa Wykonawcy: @Model.AuthorName</h4>
                     <h4>Nośnik: CD</h4> }
-                                else if (Model.ItemType == Enums.ItemType.DVD)
+                                else if (Model.ItemType == DomowaBiblioteka.Common.Enums.Enums.ItemType.DVD)
                                 {
                     <h4>Nazwisko Reżysera: @Model.AuthorName</h4>
                                     <h4>Nośnik: DVD</h4> }
@@ -31,7 +31,7 @@
                                     <h4>Nazwisko Autora: @Model.AuthorName</h4>
                                                     <h4>Nośnik: książka</h4>}
 
-                @if (Model.Status == Enums.StatusType.Dostepna)
+                @if (Model.Status == DomowaBiblioteka.Common.Enums.Enums.StatusType.Dostepna)
                 {
     <h4>Status: Na półce </h4> }
                 else

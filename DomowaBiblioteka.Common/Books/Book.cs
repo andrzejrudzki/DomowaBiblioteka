@@ -1,9 +1,9 @@
 ﻿using System;
 using static DomowaBiblioteka.Common.Enums.Enums;
 
-namespace DomowaBiblioteka.ViewModels
+namespace DomowaBiblioteka.Common.Books
 {
-    public class HomeDetailsViewModel
+    public class Book
     {
         public int Id { get; set; }
         public string Title { get; set; }
