@@ -15,6 +15,10 @@ namespace DomowaBiblioteka.ViewModels
         public ItemType ItemType { get; set; }
         public string Cover { get; set; }
         public string AuthorName { get; set; }
+
         public StatusType Status { get; set; }
+        public DateTime DateOfRent { get; set; }
+        public string RentalApprovingPerson { get; set; }
+        public string Borrower { get; set; }
     }
 }

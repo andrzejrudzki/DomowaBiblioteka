@@ -1,0 +1,22 @@
+﻿@model IEnumerable<Book>
+@{ ViewData["Title"] = "Wyszukane elementy:"; }
+
+<h1>Wyszukane elementy:</h1>
+
+<div class="card-deck">
+    @foreach (var book in Model)
+    {
+        var photoPath = book.Cover;
+        <div class="card m-3" style="min-width: 18rem; max-width:30.5%;">
+            <div class="card-header">
+                <h3>@book.Title</h3>
+            </div>
+
+            <img img class="card-img-top imageThumbnail" src="@photoPath" asp-append-version="true" />
+
+            <div class="card-footer text-center">
+                <a class="btn btn-primary" asp-controller="Home" asp-action="Details" asp-route-id="@book.Id">Szczegóły</a>
+            </div>
+        </div>}
+</div>
+

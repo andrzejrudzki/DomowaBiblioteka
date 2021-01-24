@@ -20,30 +20,52 @@
                 <h4>Data: @Model.Date</h4>
                 @if (Model.ItemType == Enums.ItemType.CD)
                 {
-    <h4>Nazwa Wykonawcy: @Model.AuthorName</h4>
+                    <h4>Nazwa Wykonawcy: @Model.AuthorName</h4>
                     <h4>Nośnik: CD</h4> }
-                                else if (Model.ItemType == Enums.ItemType.DVD)
-                                {
+                else if (Model.ItemType == Enums.ItemType.DVD)
+                {
                     <h4>Nazwisko Reżysera: @Model.AuthorName</h4>
-                                    <h4>Nośnik: DVD</h4> }
-                                                else
-                                                {
-                                    <h4>Nazwisko Autora: @Model.AuthorName</h4>
-                                                    <h4>Nośnik: książka</h4>}
+                    <h4>Nośnik: DVD</h4> }
+                else
+                {
+                    <h4>Nazwisko Autora: @Model.AuthorName</h4>
+                    <h4>Nośnik: książka</h4>}
 
                 @if (Model.Status == Enums.StatusType.Dostepna)
                 {
-    <h4>Status: Na półce </h4> }
+                    <h4>Status: Na półce </h4> }
                 else
                 {
-    <h4>Status: Wypożyczony </h4>}
+                    <h4>Status: Wypożyczony </h4>}
+
+                @if (Model.RentalApprovingPerson == "" || Model.RentalApprovingPerson == null)
+                {
+                    <h4>Data zwrotu: @Model.DateOfRent</h4>
+                }
+                else
+                {
+                    <h4>Data wypożyczenia: @Model.DateOfRent</h4>
+                    <h4>Osoba zatwierdzajaca: @Model.RentalApprovingPerson</h4>
+                    <h4>Komentarz (kto wypożyczył): @Model.Borrower</h4>
+                }
 
             </div>
             <div class="card-footer text-center">
                 <a asp-controller="Home" asp-action="index" class="btn btn-primary">Lista</a>
                 <a asp-controller="Home" asp-action="Edit" asp-route-id="@Model.Id"
                    class="btn btn-primary">Edytuj</a>
-                <a href="#" class="btn btn-danger">Usuń</a>
+                @if (Model.RentalApprovingPerson == ""|| Model.RentalApprovingPerson==null)
+                {
+                    <a asp-controller="Home" asp-action="Rent" asp-route-id="@Model.Id"
+                       class="btn btn-primary">Wypożycz</a>
+                }
+                else
+                {
+                    <a asp-controller="Home" asp-action="Return" asp-route-id="@Model.Id"
+                       class="btn btn-primary">Zwróć</a>
+                }
+                <a asp-controller="Home" asp-action="DeleteBook" asp-route-id="@Model.Id"
+                   class="btn btn-danger">Usuń</a>
             </div>
         </div>
     </div>

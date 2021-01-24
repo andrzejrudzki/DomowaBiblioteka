@@ -10,17 +10,19 @@ namespace DomowaBiblioteka.ViewModels
 {
     public class CreateViewModel
     {
+        [Required]
         [Display(Name = "Tytuł")]
         public string Title { get; set; }
+        [Required]
         [Display(Name = "Data")]
         public DateTime Date { get; set; }
+        [Required]
         [Display(Name = "Nośnik")]
         public ItemType ItemType { get; set; }
+        [Required]
         [Display(Name = "Autor/Reżyser")]
         public string AuthorName { get; set; }
         [Display(Name = "Zdjęcie")]
         public IFormFile Photo { get; set; }
-        [Display(Name = "Status")]
-        public StatusType Status { get; set; }
     }
 }

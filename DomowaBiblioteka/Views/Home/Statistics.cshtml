@@ -1,0 +1,52 @@
+﻿@model StatisticsViewModel
+
+
+<div class="container">
+    <div class="row">
+        <div class="pt-5 pb-4">
+            <h1>
+                Statystyki
+            </h1>
+
+            <h4>Ilość elementów ogółem: @Model.elementsNumber</h4>
+            <h4>Ilość elementów DVD: @Model.elementsNumberDVD</h4>
+            <h4>Ilość elementów CD: @Model.elementsNumberCD</h4>
+            <h4>Ilość książek: @Model.elementsNumberBook</h4>
+            <h4>Ilość dostępnych elementów: @Model.elementsNumberAvailable</h4>
+            <h4>Ilość niedostępnych elementów: @Model.elementsNumberUnavailable</h4>
+
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col">
+            <h2 class="pb-2">
+                Lista niedostępnych elementów:
+            </h2>
+        </div>
+    </div>
+
+</div>
+
+<div class="table-responsive">
+    <table class="table table-bordered table-hover table-condensed">
+        <thead style="background-color: rgb(227, 151, 20)">
+            <tr>
+                <th class="align-text-top py-1">Tytuł</th>
+                <th class="align-text-top py-1">Data wypożyczenia</th>
+                <th class="align-text-top py-1">Osoba zatwierdzajaca</th>
+             </tr>
+        </thead>
+        <tbody>
+            @foreach (var el in Model.unavailableElements)
+            {
+                <tr>
+                    <td class="py-1">@el.Title</td>
+                    <td class="py-1">@el.DateOfRent.ToString("yyyy-MM-dd")</td>
+                    <td class="py-1">@el.RentalApprovingPerson</td>
+                   </tr>
+            }
+        </tbody>
+    </table>
+</div>
