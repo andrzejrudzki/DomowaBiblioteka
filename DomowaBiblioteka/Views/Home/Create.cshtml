@@ -37,37 +37,14 @@
         </div>
     </div>
 
-    @*  asp-for tag helper is set to "Photo" property. "Photo" property type is IFormFile
-        so at runtime asp.net core generates file upload control (input type=file)
-    *@
-    @*  To zakomentowalem poniewaz tu wlorze bloba
-        <div class="form-group row">
-            <label asp-for="Photo" class="col-sm-2 col-form-label"></label>
-            <div class="col-sm-10">
-                <div class="custom-file">
-                    <input asp-for="Photo" class="form-control custom-file-input">
-                    <label class="custom-file-label">Wybierz plik jpg png</label>
-                </div>
-            </div>
-        </div>
-    *@
-    @* --- Blob zamiast orginalnego --- *@
-    @* <div class="row">*@
+  
     <div class="col-md-6">
-        @* <form method="post" enctype="multipart/form-data" asp-controller="Blob" asp-action="Create">*@
-        @* <div class="form-group">
-            <label> Select File </label>
-        *@
-        @* <input class="form-control" name="files" multiple="multiple" type="file" />*@
 
-        @*   --- dodane w foto ---*@
         <div class="form-group row">
             <label asp-for="Photo" class="col-sm-2 col-form-label"></label>
             <div class="col-sm-10">
                 <div class="custom-file">
 
-                    @*<input asp-for="Photo" class="form-control custom-file-input">*@
-                    @* <input class="form-control" name="files" multiple="multiple" type="file" />*@ @* input z bloba*@
                     <input asp-for="Photo" class="form-control custom-file-input" name="files" multiple="multiple" type="file">
 
                     <label class="custom-file-label">Wybierz plik jpg png</label>
@@ -75,15 +52,11 @@
                 </div>
             </div>
         </div>
-        @*   --- koniec dodane w foto ---*@
+
     </div>
-    @* <div class="form-group">*@
-    @* <input class="btn btn-success" type="submit" value="Submit" />*@
-    @*</div>*@
-    @*</form>*@
+
     </div>
-    @*</div>*@
-    @* -------------- koniec bloba -----*@
+
     <div asp-validation-summary="All" class="text-danger"></div>
 
     <div class="form-group row">
@@ -92,7 +65,7 @@
         </div>
     </div>
 
-    @*This script is required to display the selected file in the file upload element*@
+
 
     @section Scripts {
         <script>
