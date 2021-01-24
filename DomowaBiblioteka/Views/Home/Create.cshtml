@@ -37,14 +37,6 @@
         </div>
     </div>
 
-    <div class="form-group row">
-        <label asp-for="Status" class="col-sm-2 col-form-label"></label>
-        <div class="col-md-10">
-            <select asp-for="Status" class="custom-select mr-sm-2"
-                    asp-items="Html.GetEnumSelectList<Enums.StatusType>()"></select>
-        </div>
-    </div>
-
     @*  asp-for tag helper is set to "Photo" property. "Photo" property type is IFormFile
         so at runtime asp.net core generates file upload control (input type=file)
     *@

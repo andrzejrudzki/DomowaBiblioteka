@@ -26,5 +26,18 @@ namespace DomowaBiblioteka.Models
             //Loaned 
             Wypozyczony
         }
+
+        public enum ItemTypeSearch
+
+        {
+            //select
+            Wybierz,
+            //DVD
+            DVD,
+            //CD
+            CD,
+            //Book
+            Book
+        }
     }
 }

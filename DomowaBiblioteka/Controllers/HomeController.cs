@@ -15,6 +15,10 @@ using DomowaBiblioteka.ViewModels;
 using Microsoft.AspNetCore.Hosting;
 using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 using System.Diagnostics;
+using Microsoft.AspNetCore.Authorization;
+using System.Linq;
+using static DomowaBiblioteka.Models.Enums;
+using Microsoft.CodeAnalysis.Operations;
 
 namespace DomowaBiblioteka.Controllers
 
@@ -30,28 +34,73 @@ namespace DomowaBiblioteka.Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly IBookRepository _bookRepository;
         private readonly IHostingEnvironment hostingEnvironment;
-        // --- ponizszy loger powoduje bledy ---
+        private readonly IConfiguration _configuration;
+
         public HomeController(IConfiguration configuration, ILogger<HomeController> logger, IBookRepository bookRepository, IHostingEnvironment hostingEnvironment)
-        {          // chyba logowanie 
+        {
             _bookRepository = bookRepository;
             _logger = logger;
             this.hostingEnvironment = hostingEnvironment;
             _configuration = configuration;
         }
-        //------koniec z HomeController --------
 
-        private readonly IConfiguration _configuration;
-        //  public BlobController(IConfiguration configuration)
-        //   {
-        //      _configuration = configuration;
-        //  }
-        public ViewResult Index() // --- chyba wyswietlnie wszystkiego
+        [AllowAnonymous]
+        public ViewResult Index()
         {
             var model = _bookRepository.GetAll();
             return View(model);
         }
-        //-----------------------------
-        public IActionResult Details(int? id) // z HomeControler
+
+        //----------------------------- Search -----------------------------
+
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult Search()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        public IActionResult Search(SearchViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                return RedirectToAction("SearchResults", new
+                {
+                    AuthorName = model.AuthorName,
+                    title = model.Title,
+                    ItemType = model.ItemType.ToString()
+                });
+            }
+
+            return View();
+        }
+
+        [AllowAnonymous]
+        public ViewResult SearchResults(string AuthorName, string title, string ItemType)
+        {
+            var books = _bookRepository.GetAll();
+            if (AuthorName != null)
+            {
+                books = books.Where(f => f.AuthorName == AuthorName);
+            }
+            if (title != null)
+            {
+                books = books.Where(f => f.Title == title);
+            }
+
+            if (ItemType != Enums.ItemTypeSearch.Wybierz.ToString())
+            {
+                books = books.Where(f => f.ItemType.ToString() == ItemType);
+            }
+            return View(books);
+        }
+
+        //----------------------------- Details -----------------------------
+
+        [AllowAnonymous]
+        public IActionResult Details(int? id)
         {
             Book book = _bookRepository.Get(id ?? 1);
             HomeDetailsViewModel homeDetailsViewModel = new
@@ -64,12 +113,103 @@ namespace DomowaBiblioteka.Controllers
                 Title = book.Title,
                 AuthorName = book.AuthorName,
                 Status = book.Status,
+                DateOfRent = book.DateOfRent,
+                RentalApprovingPerson = book.RentalApprovingPerson,
+                Borrower = book.Borrower
             };
             return View(homeDetailsViewModel);
         }
-        //=============================
+
+        //----------------------------- Delete -----------------------------
+        public IActionResult DeleteBook(int id)
+        {
+            _bookRepository.Delete(id);
+            return RedirectToAction("Index");
+        }
+
+
+        //----------------------------- Rent -----------------------------
         [HttpGet]
-        // nazwa Createblob musi byc taka sama ja vidok Views/Blob/ Createblob.cs
+        public IActionResult Rent(int id)
+        {
+            RentViewModel rentViewModel = new
+            RentViewModel()
+            {
+                Id = id,
+            };
+            return View(rentViewModel);
+        }
+
+        [HttpPost]
+        public IActionResult Rent(RentViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                Book book = _bookRepository.Get(model.Id);
+                book.Borrower = model.Borrower;
+                book.RentalApprovingPerson = User.Identity.Name;
+                book.DateOfRent = DateTime.Now;
+                book.Status = Enums.StatusType.Wypozyczony;
+                _bookRepository.Update(book);
+
+                return RedirectToAction("Details", new { id = model.Id });
+            }
+            return View();
+        }
+
+        public IActionResult Return(int id)
+        {
+            Book book = _bookRepository.Get(id);
+            book.Status = Enums.StatusType.Dostepna;
+            book.DateOfRent = DateTime.Now;
+            book.RentalApprovingPerson = "";
+            book.Borrower = "";
+
+            _bookRepository.Update(book);
+            return RedirectToAction("Details", new { id = id });
+        }
+
+        public ViewResult Statistics()
+        {
+            var books = _bookRepository.GetAll();
+
+            StatisticsViewModel statisticsViewModel = new
+            StatisticsViewModel()
+            {
+                elementsNumber = books.Count(),
+                elementsNumberDVD = books.Where(f => f.ItemType == ItemType.DVD).Count(),
+                elementsNumberCD = books.Where(f => f.ItemType == ItemType.CD).Count(),
+                elementsNumberBook = books.Where(f => f.ItemType == ItemType.Book).Count(),
+
+                elementsNumberAvailable = books.Where(f => f.Status== StatusType.Dostepna).Count(),
+                elementsNumberUnavailable = books.Where(f => f.Status == StatusType.Wypozyczony).Count(),
+            };
+
+            List<UnavailableElement> unavailableElements = new List<UnavailableElement>();
+
+         foreach (var element in books.Where(f => f.Status == StatusType.Wypozyczony))
+            {
+                UnavailableElement unavailableElement = new UnavailableElement
+                {
+                    DateOfRent = element.DateOfRent,
+                    RentalApprovingPerson = element.RentalApprovingPerson,
+                    Title = element.Title,
+                };
+                unavailableElements.Add(unavailableElement);
+            }
+            statisticsViewModel.unavailableElements = unavailableElements;
+
+            //books = books.Where(f => f.AuthorName == AuthorName);
+
+            return View(statisticsViewModel);
+        }
+    
+
+        //============================================================
+        //============================================================
+        //============================================================
+
+        [HttpGet]
         public IActionResult Createblob()
         {
             return View();
@@ -125,11 +265,8 @@ namespace DomowaBiblioteka.Controllers
             return View();
         }
 
-
-
         //============================================================
         //............................................................
-
 
         [HttpGet]
         public IActionResult Create()
@@ -140,11 +277,8 @@ namespace DomowaBiblioteka.Controllers
         // --- blob ---  public async Task<IActionResult> Createblob(IFormFile files)
 
 
-
         [HttpPost]
         //public IActionResult Create(CreateViewModel model)
-
-
         public async Task<IActionResult> Create(IFormFile files, CreateViewModel model)
         //=======================================================================
         //--- azurowe rozwiazanie ---
@@ -174,12 +308,13 @@ namespace DomowaBiblioteka.Controllers
             }
 
 
-
             BlobContainerPermissions permissions = new BlobContainerPermissions
             {
                 PublicAccess = BlobContainerPublicAccessType.Blob
             };
+            
 
+            //Waldek zdjęcie jest opcjonalne
             string systemFileName = files.FileName;
             await using (var target = new MemoryStream())
             {
@@ -214,10 +349,12 @@ namespace DomowaBiblioteka.Controllers
                     Title = model.Title,
                     Date = model.Date,
                     ItemType = model.ItemType,
+                    AuthorName = model.AuthorName,
                     // do cover podac link uri blob.Uri
                     //  Cover = uniqueFileName,
                     Cover = nazwa_bloaba1, // dodalem1 to jest z bloba nazwa
-                    Status = model.Status
+                    Status = StatusType.Dostepna,
+                    DateOfRent = DateTime.Now
                 };
 
                 _bookRepository.Add(newBook);
@@ -242,7 +379,6 @@ namespace DomowaBiblioteka.Controllers
                 Title = book.Title,
                 AuthorName = book.AuthorName,
                 ExistingPhotoPath = book.Cover,
-                Status = book.Status
             };
             return View(bookEditViewModel);
         }
@@ -283,6 +419,7 @@ namespace DomowaBiblioteka.Controllers
                 {
                     PublicAccess = BlobContainerPublicAccessType.Blob
                 };
+                //Waldek tutaj
                 string systemFileName = files.FileName;
                 await using (var target = new MemoryStream())
                 {
@@ -310,7 +447,6 @@ namespace DomowaBiblioteka.Controllers
                     book.Date = model.Date;
                     book.ItemType = model.ItemType;
                     book.AuthorName = model.AuthorName;
-                    book.Status = model.Status;
                     // dodalem cover
                     book.Cover = nazwa_bloaba1; // dorobilem1 pobiera adres uri bloba
                     /*
@@ -330,7 +466,6 @@ namespace DomowaBiblioteka.Controllers
                 }
                 return View();
             }
-
 
         }
 

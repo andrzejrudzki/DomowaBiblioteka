@@ -1,4 +1,7 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> signInManager
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -6,6 +9,9 @@
 
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link href="~/lib/bootstrap/dist/css/bootstrap.css" rel="stylesheet" />
+    <script src="~/lib/jquery/dist/jquery.js"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
     <link rel="stylesheet" href="~/css/site.css" />
 
     <title>@ViewData["Title"]</title>
@@ -30,15 +36,47 @@
                     <li class="nav-item">
                         <a class="nav-link" asp-controller="home" asp-action="Create">Dodaj element</a>
                     </li>
-
                     <li class="nav-item">
+                        <a class="nav-link" asp-controller="home" asp-action="Search">Szukaj</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="home" asp-action="Statistics">Statystyki</a>
+                    </li>
+                      
+
+                    @*<li class="nav-item">
                         <a class="nav-link" asp-controller="home" asp-action="Createblob">Zapis do Bloba</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" asp-controller="home" asp-action="ShowAllBlobs">Pokaż zdjęcia z Bloba</a>
-                    </li>
-
-
+                    </li>*@
+                </ul>
+                <ul class="navbar-nav ml-auto">
+                    @*If the user is signed-in display Logout link*@
+                    @if (signInManager.IsSignedIn(User))
+                    {
+                        <li class="nav-item">
+                            <form method="post" asp-controller="account" asp-action="logout">
+                                <button type="submit" style="width:auto"
+                                        class="nav-link btn btn-link py-0">
+                                    Logout @User.Identity.Name
+                                </button>
+                            </form>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="account" asp-action="register">
+                                Register
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="account" asp-action="login">
+                                Login
+                            </a>
+                        </li>
+                    }
                 </ul>
             </div>
         </nav>
